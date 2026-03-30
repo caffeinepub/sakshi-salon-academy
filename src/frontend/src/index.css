@@ -11,49 +11,60 @@
 
 @layer base {
   :root {
-    --radius: 0.625rem;
+    --radius: 0.75rem;
 
-    /* Salon palette */
-    --blush: 0.936 0.022 10;
-    --blush-light: 0.964 0.014 10;
-    --gold: 0.722 0.072 75;
-    --gold-dark: 0.62 0.075 72;
-    --salon-dark: 0.14 0 0;
-    --muted-text: 0.52 0 0;
-    --footer-bg: 0.11 0 0;
+    /* Nail World palette — from Design Description */
+    /* Background: #F7F2EA warm cream */
+    --cream: 0.962 0.016 78;
+    /* Blush panels: #F1E2E0 */
+    --blush: 0.918 0.022 16;
+    /* Deeper blush: #E9D2D1 */
+    --blush-deep: 0.875 0.032 16;
+    /* Body text: #3A3432 */
+    --nail-dark: 0.253 0.012 42;
+    /* Muted text: #6E6461 */
+    --nail-muted: 0.462 0.016 40;
+    /* Gold: #B08A45 */
+    --gold: 0.628 0.087 72;
+    --gold-dark: 0.55 0.082 70;
+    /* Dusty rose CTA: #CFA1A0 */
+    --rose: 0.712 0.072 16;
+    --rose-dark: 0.638 0.08 16;
+    /* Borders: #E7DDDA */
+    --nail-border: 0.9 0.016 24;
 
-    --background: 1 0 0;
-    --foreground: 0.14 0 0;
+    --background: 0.962 0.016 78;
+    --foreground: 0.253 0.012 42;
     --card: 1 0 0;
-    --card-foreground: 0.14 0 0;
+    --card-foreground: 0.253 0.012 42;
     --popover: 1 0 0;
-    --popover-foreground: 0.14 0 0;
-    --primary: 0.722 0.072 75;
+    --popover-foreground: 0.253 0.012 42;
+    --primary: 0.712 0.072 16;
     --primary-foreground: 1 0 0;
-    --secondary: 0.936 0.022 10;
-    --secondary-foreground: 0.14 0 0;
-    --muted: 0.936 0.022 10;
-    --muted-foreground: 0.52 0 0;
-    --accent: 0.722 0.072 75;
+    --secondary: 0.918 0.022 16;
+    --secondary-foreground: 0.253 0.012 42;
+    --muted: 0.918 0.022 16;
+    --muted-foreground: 0.462 0.016 40;
+    --accent: 0.628 0.087 72;
     --accent-foreground: 1 0 0;
     --destructive: 0.577 0.245 27.325;
     --destructive-foreground: 0.985 0 0;
-    --border: 0.9 0.014 10;
-    --input: 0.9 0.014 10;
-    --ring: 0.722 0.072 75;
+    --border: 0.9 0.016 24;
+    --input: 0.9 0.016 24;
+    --ring: 0.712 0.072 16;
     --chart-1: 0.646 0.222 41.116;
     --chart-2: 0.6 0.118 184.704;
     --chart-3: 0.398 0.07 227.392;
     --chart-4: 0.828 0.189 84.429;
     --chart-5: 0.769 0.188 70.08;
     --sidebar: 1 0 0;
-    --sidebar-foreground: 0.14 0 0;
-    --sidebar-primary: 0.722 0.072 75;
+    --sidebar-foreground: 0.253 0.012 42;
+    --sidebar-primary: 0.712 0.072 16;
     --sidebar-primary-foreground: 1 0 0;
-    --sidebar-accent: 0.936 0.022 10;
-    --sidebar-accent-foreground: 0.14 0 0;
-    --sidebar-border: 0.9 0.014 10;
-    --sidebar-ring: 0.722 0.072 75;
+    --sidebar-accent: 0.918 0.022 16;
+    --sidebar-accent-foreground: 0.253 0.012 42;
+    --sidebar-border: 0.9 0.016 24;
+    --sidebar-ring: 0.712 0.072 16;
   }
 
   * {
@@ -65,17 +76,9 @@
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-family: "Poppins", sans-serif;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-family: "Playfair Display", serif;
+    background-color: oklch(var(--background));
+    color: oklch(var(--foreground));
+    font-family: "Inter", sans-serif;
   }
 }
 
@@ -84,8 +87,12 @@
     font-family: "Playfair Display", serif;
   }
 
-  .font-poppins {
-    font-family: "Poppins", sans-serif;
+  .font-inter {
+    font-family: "Inter", sans-serif;
+  }
+
+  .font-cormorant {
+    font-family: "Cormorant Garamond", serif;
   }
 
   .text-gold {
@@ -96,12 +103,24 @@
     background-color: oklch(var(--gold));
   }
 
-  .bg-blush {
+  .bg-rose-cta {
+    background-color: oklch(var(--rose));
+  }
+
+  .hover\:bg-rose-dark:hover {
+    background-color: oklch(var(--rose-dark));
+  }
+
+  .bg-cream {
+    background-color: oklch(var(--cream));
+  }
+
+  .bg-blush-panel {
     background-color: oklch(var(--blush));
   }
 
-  .bg-blush-light {
-    background-color: oklch(var(--blush-light));
+  .bg-blush-deep {
+    background-color: oklch(var(--blush-deep));
   }
 
   .border-gold {
@@ -112,15 +131,20 @@
     background-color: oklch(var(--gold-dark));
   }
 
-  .text-muted-salon {
-    color: oklch(var(--muted-text));
+  .text-nail-dark {
+    color: oklch(var(--nail-dark));
   }
 
-  /* Scroll animation */
+  .text-nail-muted {
+    color: oklch(var(--nail-muted));
+  }
+
+  /* Scroll animations */
   .fade-up {
     opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
+    transform: translateY(32px);
+    transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1), transform 0.75s
+      cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .fade-up.visible {
@@ -148,12 +172,7 @@
   .gallery-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 200px;
     gap: 12px;
-  }
-
-  .gallery-tall {
-    grid-row: span 2;
   }
 
   @media (max-width: 768px) {
@@ -165,9 +184,6 @@
   @media (max-width: 480px) {
     .gallery-grid {
       grid-template-columns: 1fr;
-    }
-    .gallery-tall {
-      grid-row: span 1;
     }
   }
 }

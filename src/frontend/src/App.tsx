@@ -1,113 +1,183 @@
 import {
-  Check,
   ChevronRight,
   Clock,
   Facebook,
   Instagram,
-  Mail,
   MapPin,
   Menu,
   MessageCircle,
   Phone,
   Sparkles,
+  Star,
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useScrollAnimation } from "./hooks/useScrollAnimation";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// ─── Constants ────────────────────────────────────────────────────────────────
 
-interface ContactForm {
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-}
-
-// ─── Constants ───────────────────────────────────────────────────────────────
+const WHATSAPP_NUMBER = "919810128513";
+const WHATSAPP_MSG = encodeURIComponent(
+  "Hello Nail World by Pratima! I would like to book a nail appointment. Please let me know the available slots. Thank you!",
+);
+const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MSG}`;
 
 const NAV_LINKS = [
-  { label: "Home", href: "#home" },
-  { label: "Services", href: "#services" },
-  { label: "About", href: "#about" },
-  { label: "Gallery", href: "#gallery" },
-  { label: "Contact", href: "#contact" },
+  { label: "HOME", href: "#home" },
+  { label: "SERVICES", href: "#services" },
+  { label: "GALLERY", href: "#gallery" },
+  { label: "ABOUT", href: "#about" },
+  { label: "CONTACT", href: "#contact" },
 ];
 
 const SERVICES = [
   {
-    title: "Facials",
+    title: "Nail Extensions",
     description:
-      "Rejuvenate your skin with our premium facial treatments using the latest techniques and luxury products tailored to your skin type.",
-    image: "/assets/generated/service-facial.dim_400x300.jpg",
-    icon: "✨",
+      "Achieve the length and shape you've always dreamed of. Our premium acrylic and gel extensions are crafted to perfection with superior durability.",
+    price: "Starting ₹799",
+    image: "/assets/generated/service-extensions.dim_400x300.jpg",
   },
   {
-    title: "Hair Care",
+    title: "Gel Polish",
     description:
-      "From expert cuts and vibrant color to nourishing treatments, our stylists craft looks that celebrate your individual beauty.",
-    image: "/assets/generated/service-hair.dim_400x300.jpg",
-    icon: "💇",
+      "Long-lasting, chip-free gel polish in hundreds of shades. Mirror-finish shine that stays flawless for 3–4 weeks without fading.",
+    price: "Starting ₹499",
+    image: "/assets/generated/service-gel.dim_400x300.jpg",
   },
   {
-    title: "Makeup",
+    title: "Nail Art Designs",
     description:
-      "Whether for bridal, party, or everyday glam, our makeup artists create flawless looks that last all day and night.",
-    image: "/assets/generated/service-makeup.dim_400x300.jpg",
-    icon: "💄",
+      "From delicate florals to bold geometric patterns — our nail artists create bespoke hand-painted designs that make every nail a canvas.",
+    price: "Starting ₹299",
+    image: "/assets/generated/service-nailart.dim_400x300.jpg",
   },
   {
-    title: "Waxing",
+    title: "Manicure & Pedicure",
     description:
-      "Smooth, gentle, and long-lasting waxing services for all skin types. We use premium wax for a comfortable experience.",
-    image: null,
-    icon: "🌸",
-  },
-  {
-    title: "Nail Care",
-    description:
-      "Pamper yourself with our nail services — manicures, pedicures, nail art, and gel extensions for perfectly polished nails.",
-    image: "/assets/generated/service-nails.dim_400x300.jpg",
-    icon: "💅",
+      "Indulge in our signature spa manicure and pedicure treatments. Deep nourishment, exfoliation, and relaxation all in one luxury session.",
+    price: "Starting ₹599",
+    image: "/assets/generated/service-manicure.dim_400x300.jpg",
   },
 ];
 
-const GALLERY_IMAGES = [
+const GALLERY_CATEGORIES = [
   {
-    src: "/assets/generated/gallery-1.dim_400x500.jpg",
-    tall: true,
-    alt: "Bridal Hairstyle",
+    id: "bridal",
+    label: "Bridal Nails",
+    images: [
+      {
+        src: "/assets/generated/gallery-bridal.dim_600x400.jpg",
+        alt: "Bridal nail design with crystals",
+      },
+      {
+        src: "/assets/generated/gallery-bridal.dim_600x400.jpg",
+        alt: "Bridal white lace nails",
+      },
+      {
+        src: "/assets/generated/gallery-bridal.dim_600x400.jpg",
+        alt: "Bridal pearl nails",
+      },
+      {
+        src: "/assets/generated/gallery-bridal.dim_600x400.jpg",
+        alt: "Bridal French tip nails",
+      },
+      {
+        src: "/assets/generated/gallery-bridal.dim_600x400.jpg",
+        alt: "Bridal rose gold nails",
+      },
+      {
+        src: "/assets/generated/gallery-bridal.dim_600x400.jpg",
+        alt: "Bridal floral nail art",
+      },
+    ],
   },
   {
-    src: "/assets/generated/gallery-2.dim_400x300.jpg",
-    tall: false,
-    alt: "Skin Facial",
+    id: "party",
+    label: "Party Nails",
+    images: [
+      {
+        src: "/assets/generated/gallery-party.dim_600x400.jpg",
+        alt: "Glitter party nails",
+      },
+      {
+        src: "/assets/generated/gallery-party.dim_600x400.jpg",
+        alt: "Rose gold glitter nails",
+      },
+      {
+        src: "/assets/generated/gallery-party.dim_600x400.jpg",
+        alt: "Gold foil party nails",
+      },
+      {
+        src: "/assets/generated/gallery-party.dim_600x400.jpg",
+        alt: "Dramatic black party nails",
+      },
+      {
+        src: "/assets/generated/gallery-party.dim_600x400.jpg",
+        alt: "Festive sparkle nails",
+      },
+      {
+        src: "/assets/generated/gallery-party.dim_600x400.jpg",
+        alt: "Jewel party nails",
+      },
+    ],
   },
   {
-    src: "/assets/generated/gallery-3.dim_400x300.jpg",
-    tall: false,
-    alt: "Hair Color",
-  },
-  {
-    src: "/assets/generated/gallery-4.dim_400x300.jpg",
-    tall: false,
-    alt: "Nail Art",
-  },
-  {
-    src: "/assets/generated/gallery-5.dim_400x500.jpg",
-    tall: true,
-    alt: "Bridal Makeup",
-  },
-  {
-    src: "/assets/generated/gallery-6.dim_400x300.jpg",
-    tall: false,
-    alt: "Hair Styling",
+    id: "simple",
+    label: "Simple Nails",
+    images: [
+      {
+        src: "/assets/generated/gallery-simple.dim_600x400.jpg",
+        alt: "Minimalist nude nails",
+      },
+      {
+        src: "/assets/generated/gallery-simple.dim_600x400.jpg",
+        alt: "Classic French manicure",
+      },
+      {
+        src: "/assets/generated/gallery-simple.dim_600x400.jpg",
+        alt: "Simple blush nails",
+      },
+      {
+        src: "/assets/generated/gallery-simple.dim_600x400.jpg",
+        alt: "Clean natural nails",
+      },
+      {
+        src: "/assets/generated/gallery-simple.dim_600x400.jpg",
+        alt: "Soft pink short nails",
+      },
+      {
+        src: "/assets/generated/gallery-simple.dim_600x400.jpg",
+        alt: "Everyday elegant nails",
+      },
+    ],
   },
 ];
 
-// ─── Gold Button ─────────────────────────────────────────────────────────────
+const TESTIMONIALS = [
+  {
+    name: "Priya Sharma",
+    text: "Absolutely loved my experience at Nail World! Pratima is incredibly talented — my bridal nails were exactly what I envisioned. Every guest complimented them at my wedding!",
+    rating: 5,
+    initials: "PS",
+  },
+  {
+    name: "Ananya Gupta",
+    text: "Best nail salon in Ghaziabad hands down. The gel polish lasted over a month without chipping. The studio is so clean and premium. I'm a regular customer now!",
+    rating: 5,
+    initials: "AG",
+  },
+  {
+    name: "Meera Joshi",
+    text: "Pratima's nail art skills are beyond amazing. She did a custom floral design for my sister's mehendi and everyone was asking for the salon's details. Highly recommended!",
+    rating: 5,
+    initials: "MJ",
+  },
+];
 
-function GoldButton({
+// ─── Rose CTA Button ──────────────────────────────────────────────────────────
+
+function RoseButton({
   children,
   href,
   onClick,
@@ -120,7 +190,7 @@ function GoldButton({
   className?: string;
   "data-ocid"?: string;
 }) {
-  const cls = `inline-flex items-center justify-center gap-2 bg-gold hover:bg-gold-dark text-white font-poppins font-semibold text-sm rounded-full px-7 py-3 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 ${className}`;
+  const cls = `inline-flex items-center justify-center gap-2 bg-rose-cta hover:bg-rose-dark text-white font-inter font-semibold text-sm rounded-full px-8 py-3.5 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 ${className}`;
   if (href) {
     return (
       <a href={href} className={cls} data-ocid={dataOcid}>
@@ -140,23 +210,45 @@ function GoldButton({
   );
 }
 
-// ─── Section Heading ─────────────────────────────────────────────────────────
+// ─── Gold Button ──────────────────────────────────────────────────────────────
 
-function SectionHeading({
-  title,
-  subtitle,
-}: { title: string; subtitle?: string }) {
+function GoldButton({
+  children,
+  href,
+  className = "",
+  "data-ocid": dataOcid,
+}: {
+  children: React.ReactNode;
+  href?: string;
+  className?: string;
+  "data-ocid"?: string;
+}) {
+  const cls = `inline-flex items-center justify-center gap-2 border-2 border-gold text-gold hover:bg-gold hover:text-white font-inter font-semibold text-sm rounded-full px-8 py-3.5 transition-all duration-300 ${className}`;
   return (
-    <div className="text-center mb-14 fade-up">
-      <h2 className="font-playfair text-4xl md:text-5xl font-bold text-salon-dark mb-4">
-        {title}
-      </h2>
-      {subtitle && (
-        <p className="font-poppins text-muted-salon text-base max-w-xl mx-auto">
-          {subtitle}
-        </p>
-      )}
-      <div className="mx-auto mt-4 h-0.5 w-16 bg-gold rounded-full" />
+    <a href={href} className={cls} data-ocid={dataOcid}>
+      {children}
+    </a>
+  );
+}
+
+// ─── Section Label ────────────────────────────────────────────────────────────
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="font-inter text-xs font-semibold tracking-[0.2em] uppercase text-gold mb-3">
+      {children}
+    </p>
+  );
+}
+
+// ─── Gold Divider ─────────────────────────────────────────────────────────────
+
+function GoldDivider() {
+  return (
+    <div className="flex items-center gap-2 my-4">
+      <div className="h-px w-8 bg-gold/40" />
+      <Sparkles size={12} className="text-gold" />
+      <div className="h-px w-8 bg-gold/40" />
     </div>
   );
 }
@@ -168,7 +260,7 @@ function Navbar() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -177,33 +269,46 @@ function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 bg-white transition-shadow duration-300 ${
-        scrolled ? "shadow-md" : "shadow-sm"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "bg-white/95 backdrop-blur-sm shadow-md"
+          : "bg-white/90 backdrop-blur-sm shadow-sm"
       }`}
     >
+      {/* Top tagline strip */}
+      <div
+        className="hidden md:flex items-center justify-center py-1.5 text-xs font-inter tracking-wider"
+        style={{ backgroundColor: "oklch(var(--blush))" }}
+      >
+        <span className="text-nail-muted">
+          ✦ &nbsp; Luxury Nails, Perfect Style &nbsp; ✦ &nbsp; Open 11 AM – 8 PM
+          &nbsp; ✦ &nbsp; +91 98101 28513
+        </span>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16 md:h-18">
           {/* Logo */}
           <a
             href="#home"
             className="flex flex-col leading-tight"
             data-ocid="nav.link"
           >
-            <span className="font-playfair text-2xl font-bold text-gold">
-              Sakshi
+            <span className="font-playfair text-xl font-bold tracking-widest uppercase text-gold">
+              Nail World
             </span>
-            <span className="font-poppins text-xs font-medium text-salon-dark tracking-widest uppercase">
-              Salon &amp; Academy
+            <span className="font-cormorant italic text-xs font-medium text-nail-dark tracking-wider">
+              by Pratima
             </span>
           </a>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-7">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="font-poppins text-sm font-medium text-salon-dark hover:text-gold transition-colors duration-200"
+                className="font-inter text-xs font-semibold tracking-wider text-nail-dark hover:text-gold transition-colors duration-200"
                 data-ocid="nav.link"
               >
                 {link.label}
@@ -213,46 +318,50 @@ function Navbar() {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex">
-            <GoldButton href="#contact" data-ocid="nav.primary_button">
-              Book Appointment
-            </GoldButton>
+            <RoseButton href="#contact" data-ocid="nav.primary_button">
+              Book Online
+            </RoseButton>
           </div>
 
           {/* Mobile hamburger */}
           <button
             type="button"
-            className="md:hidden p-2 text-salon-dark hover:text-gold transition-colors"
+            className="md:hidden p-2 text-nail-dark hover:text-gold transition-colors"
             onClick={() => setMobileOpen((v) => !v)}
             aria-label="Toggle menu"
             data-ocid="nav.toggle"
           >
-            {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
       </div>
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-white border-t border-blush shadow-lg">
-          <div className="px-4 py-4 flex flex-col gap-4">
+        <div
+          className="md:hidden border-t shadow-lg"
+          style={{ backgroundColor: "oklch(var(--cream))" }}
+        >
+          <div className="px-5 py-5 flex flex-col gap-4">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={closeMenu}
-                className="font-poppins text-sm font-medium text-salon-dark hover:text-gold transition-colors py-2 border-b border-blush last:border-0"
+                className="font-inter text-sm font-semibold tracking-wider text-nail-dark hover:text-gold transition-colors py-2.5 border-b last:border-0"
+                style={{ borderColor: "oklch(var(--nail-border))" }}
                 data-ocid="nav.link"
               >
                 {link.label}
               </a>
             ))}
-            <GoldButton
+            <RoseButton
               href="#contact"
               className="mt-2"
               data-ocid="nav.primary_button"
             >
-              Book Appointment
-            </GoldButton>
+              Book Online
+            </RoseButton>
           </div>
         </div>
       )}
@@ -264,56 +373,78 @@ function Navbar() {
 
 function HeroSection() {
   return (
-    <section
-      id="home"
-      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden"
-    >
-      {/* Background image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage:
-            "url('/assets/generated/hero-salon.dim_1400x700.jpg')",
-        }}
-      />
-      {/* Dark overlay */}
-      <div
-        className="absolute inset-0"
-        style={{ background: "rgba(0,0,0,0.52)" }}
-      />
+    <section id="home" className="pt-28 md:pt-32 pb-16 md:pb-24 bg-cream">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left text */}
+          <div className="fade-up">
+            <SectionLabel>✦ Premium Nail Studio</SectionLabel>
+            <h1 className="font-playfair text-4xl md:text-5xl lg:text-6xl font-bold text-gold leading-tight mb-5">
+              Get Beautiful Nails
+              <br />
+              <em className="not-italic text-nail-dark">That Shine</em>
+            </h1>
+            <p className="font-inter text-base text-nail-muted leading-relaxed mb-8 max-w-md">
+              Professional Nail Art &amp; Care Services in Ghaziabad. Experience
+              luxury nail care at Nail World by Pratima.
+            </p>
 
-      {/* Content */}
-      <div className="relative z-10 text-center px-4 max-w-3xl mx-auto">
-        <p className="font-poppins text-sm font-medium tracking-[0.25em] uppercase text-gold mb-4 fade-up">
-          Welcome to Sakshi Salon &amp; Academy
-        </p>
-        <h1 className="font-playfair text-5xl md:text-7xl font-bold text-gold leading-tight mb-6 fade-up fade-up-delay-1">
-          Enhance Your Beauty
-          <br />
-          <em className="not-italic text-white">With Experts</em>
-        </h1>
-        <p className="font-poppins text-lg text-white/90 mb-10 fade-up fade-up-delay-2">
-          Professional Salon &amp; Academy – 24 Hours Service
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center fade-up fade-up-delay-3">
-          <GoldButton href="#contact" data-ocid="hero.primary_button">
-            <Sparkles size={16} />
-            Book Appointment
-          </GoldButton>
-          <a
-            href="#services"
-            className="inline-flex items-center justify-center gap-2 border-2 border-white text-white font-poppins font-semibold text-sm rounded-full px-7 py-3 hover:bg-white hover:text-salon-dark transition-all duration-300"
-            data-ocid="hero.secondary_button"
-          >
-            Our Services <ChevronRight size={16} />
-          </a>
-        </div>
-      </div>
+            {/* Trust badges */}
+            <div className="flex flex-wrap gap-4 mb-10">
+              {[
+                { icon: "💅", label: "500+ Happy Clients" },
+                { icon: "⭐", label: "8+ Years Experience" },
+                { icon: "✨", label: "Premium Products" },
+              ].map((badge) => (
+                <div
+                  key={badge.label}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-inter font-medium text-nail-dark"
+                  style={{
+                    borderColor: "oklch(var(--gold) / 0.3)",
+                    backgroundColor: "oklch(var(--blush))",
+                  }}
+                >
+                  <span>{badge.icon}</span>
+                  <span>{badge.label}</span>
+                </div>
+              ))}
+            </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 rounded-full border-2 border-white/50 flex items-start justify-center pt-2">
-          <div className="w-1 h-2 bg-white/70 rounded-full" />
+            <div className="flex flex-col sm:flex-row gap-4">
+              <RoseButton href="#contact" data-ocid="hero.primary_button">
+                Book Appointment
+              </RoseButton>
+              <GoldButton href="#services" data-ocid="hero.secondary_button">
+                Our Services <ChevronRight size={14} />
+              </GoldButton>
+            </div>
+          </div>
+
+          {/* Right image */}
+          <div className="relative fade-up fade-up-delay-2">
+            <div
+              className="absolute -top-4 -right-4 w-full h-full rounded-3xl"
+              style={{ border: "2px solid oklch(var(--gold) / 0.2)" }}
+            />
+            <img
+              src="/assets/generated/hero-nails.dim_800x600.jpg"
+              alt="Luxury nail art by Nail World by Pratima"
+              className="relative z-10 w-full rounded-3xl shadow-luxury object-cover"
+              style={{ maxHeight: "480px" }}
+            />
+            {/* Floating badge */}
+            <div
+              className="absolute -bottom-5 -left-5 z-20 rounded-2xl px-5 py-4 shadow-card"
+              style={{ backgroundColor: "oklch(var(--blush-deep))" }}
+            >
+              <p className="font-inter text-xs font-semibold uppercase tracking-wider text-gold mb-0.5">
+                Open Today
+              </p>
+              <p className="font-playfair text-lg font-bold text-nail-dark">
+                11 AM – 8 PM
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -324,45 +455,61 @@ function HeroSection() {
 
 function ServicesSection() {
   return (
-    <section id="services" className="py-24 bg-blush">
+    <section
+      id="services"
+      className="py-20 md:py-28"
+      style={{ backgroundColor: "oklch(var(--blush))" }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <SectionHeading
-          title="Our Services"
-          subtitle="Indulge in a world of beauty with our comprehensive range of luxury services crafted just for you."
-        />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="text-center mb-14 fade-up">
+          <SectionLabel>What We Offer</SectionLabel>
+          <h2 className="font-playfair text-3xl md:text-4xl font-bold text-nail-dark mb-4">
+            Our Premium Services
+          </h2>
+          <GoldDivider />
+          <p className="font-inter text-nail-muted max-w-xl mx-auto">
+            Each service is delivered with precision, premium products, and a
+            touch of artistry that sets us apart.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
           {SERVICES.map((service, i) => (
             <div
               key={service.title}
-              className={`fade-up fade-up-delay-${Math.min(i + 1, 5)} bg-white rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300`}
+              className={`fade-up fade-up-delay-${i + 1} bg-white rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300`}
               data-ocid={`services.item.${i + 1}`}
             >
-              {service.image ? (
-                <div className="h-52 overflow-hidden">
-                  <img
-                    src={service.image}
-                    alt={service.title}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-              ) : (
-                <div className="h-52 bg-gradient-to-br from-blush to-white flex items-center justify-center">
-                  <span className="text-6xl">{service.icon}</span>
-                </div>
-              )}
+              <div className="h-52 overflow-hidden">
+                <img
+                  src={service.image}
+                  alt={service.title}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                />
+              </div>
               <div className="p-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xl">{service.icon}</span>
-                  <h3 className="font-playfair text-xl font-bold text-salon-dark">
+                <div className="flex items-start justify-between mb-2">
+                  <h3 className="font-playfair text-xl font-bold text-nail-dark">
                     {service.title}
                   </h3>
+                  <span
+                    className="font-inter text-xs font-semibold px-3 py-1 rounded-full flex-shrink-0 ml-3"
+                    style={{
+                      backgroundColor: "oklch(var(--blush))",
+                      color: "oklch(var(--gold))",
+                    }}
+                  >
+                    {service.price}
+                  </span>
                 </div>
-                <p className="font-poppins text-sm text-muted-salon leading-relaxed">
+                <p className="font-inter text-sm text-nail-muted leading-relaxed mb-4">
                   {service.description}
                 </p>
                 <a
-                  href="#contact"
-                  className="inline-flex items-center gap-1 mt-4 text-gold font-poppins text-sm font-semibold hover:gap-2 transition-all duration-200"
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-rose-cta font-inter text-sm font-semibold hover:gap-2 transition-all duration-200"
                   data-ocid={`services.link.${i + 1}`}
                 >
                   Book Now <ChevronRight size={14} />
@@ -376,111 +523,59 @@ function ServicesSection() {
   );
 }
 
-// ─── About ────────────────────────────────────────────────────────────────────
-
-function AboutSection() {
-  const highlights = [
-    "Professional & Experienced Staff",
-    "Latest Beauty Techniques",
-    "Professional Training Courses Available",
-  ];
-
-  return (
-    <section id="about" className="py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Text */}
-          <div className="fade-up">
-            <p className="font-poppins text-sm font-semibold tracking-widest text-gold uppercase mb-3">
-              About Us
-            </p>
-            <h2 className="font-playfair text-4xl md:text-5xl font-bold text-salon-dark mb-6 leading-tight">
-              Sakshi Salon
-              <br />
-              <span className="text-gold">&amp; Academy</span>
-            </h2>
-            <div className="w-12 h-0.5 bg-gold mb-6" />
-            <p className="font-poppins text-muted-salon leading-relaxed mb-6">
-              Welcome to Sakshi Salon & Academy — Ghaziabad's premier
-              destination for beauty and wellness. Nestled in the heart of
-              Shastri Nagar, we combine artistry with expertise to deliver
-              transformative beauty experiences that leave you feeling confident
-              and radiant.
-            </p>
-            <p className="font-poppins text-muted-salon leading-relaxed mb-10">
-              Beyond our salon services, our Academy offers professional
-              training programs in beauty and cosmetology, empowering the next
-              generation of beauty professionals with world-class education and
-              hands-on experience.
-            </p>
-            <ul className="space-y-4">
-              {highlights.map((item) => (
-                <li key={item} className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-6 h-6 bg-gold rounded-full flex items-center justify-center mt-0.5">
-                    <Check size={12} className="text-white" />
-                  </span>
-                  <span className="font-poppins text-salon-dark font-medium">
-                    {item}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-10">
-              <GoldButton href="#contact" data-ocid="about.primary_button">
-                Learn More About Us
-              </GoldButton>
-            </div>
-          </div>
-
-          {/* Image */}
-          <div className="relative fade-up fade-up-delay-2">
-            <div className="absolute -top-4 -left-4 w-full h-full border-2 border-gold/30 rounded-2xl" />
-            <img
-              src="/assets/generated/about-salon.dim_500x600.jpg"
-              alt="Sakshi Salon & Academy"
-              className="relative z-10 w-full rounded-2xl shadow-xl object-cover"
-              style={{ maxHeight: "580px" }}
-            />
-            {/* Badge */}
-            <div className="absolute -bottom-6 -right-6 z-20 bg-gold text-white rounded-2xl p-5 shadow-xl">
-              <p className="font-poppins text-xs font-semibold tracking-wider uppercase mb-1">
-                Open
-              </p>
-              <p className="font-playfair text-2xl font-bold">24 Hours</p>
-              <p className="font-poppins text-xs opacity-80">
-                Always Here For You
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 // ─── Gallery ──────────────────────────────────────────────────────────────────
 
 function GallerySection() {
+  const [activeCategory, setActiveCategory] = useState("bridal");
+  const category =
+    GALLERY_CATEGORIES.find((c) => c.id === activeCategory) ??
+    GALLERY_CATEGORIES[0];
+
   return (
-    <section id="gallery" className="py-24 bg-blush">
+    <section id="gallery" className="py-20 md:py-28 bg-cream">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <SectionHeading
-          title="Our Gallery"
-          subtitle="A glimpse into the transformations and artistry we create every day at Sakshi Salon."
-        />
-        <div className="gallery-grid">
-          {GALLERY_IMAGES.map((img, i) => (
-            <div
-              key={img.src}
-              className={`overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300 group fade-up fade-up-delay-${Math.min(i + 1, 5)} ${
-                img.tall ? "gallery-tall" : ""
+        <div className="text-center mb-12 fade-up">
+          <SectionLabel>Our Work</SectionLabel>
+          <h2 className="font-playfair text-3xl md:text-4xl font-bold text-nail-dark mb-4">
+            Gallery of Artistry
+          </h2>
+          <GoldDivider />
+          <p className="font-inter text-nail-muted max-w-xl mx-auto">
+            A glimpse into the stunning designs crafted by Pratima and her team.
+          </p>
+        </div>
+
+        {/* Category tabs */}
+        <div className="flex justify-center gap-2 mb-10 fade-up">
+          {GALLERY_CATEGORIES.map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => setActiveCategory(cat.id)}
+              className={`font-inter text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-200 ${
+                activeCategory === cat.id
+                  ? "bg-rose-cta text-white shadow-md"
+                  : "bg-white text-nail-muted hover:text-nail-dark border border-nail-border"
               }`}
+              data-ocid="gallery.tab"
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Grid */}
+        <div className="gallery-grid fade-up">
+          {category.images.map((img, i) => (
+            <div
+              key={`${activeCategory}-${img.alt}`}
+              className="overflow-hidden rounded-xl shadow-card hover:shadow-card-hover transition-all duration-300 group aspect-video"
               data-ocid={`gallery.item.${i + 1}`}
             >
               <img
                 src={img.src}
                 alt={img.alt}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
               />
             </div>
           ))}
@@ -490,129 +585,314 @@ function GallerySection() {
   );
 }
 
-// ─── Contact & Map ────────────────────────────────────────────────────────────
+// ─── Testimonials ─────────────────────────────────────────────────────────────
+
+function TestimonialsSection() {
+  return (
+    <section
+      className="py-20 md:py-28"
+      style={{ backgroundColor: "oklch(var(--blush))" }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-14 fade-up">
+          <SectionLabel>Happy Clients</SectionLabel>
+          <h2 className="font-playfair text-3xl md:text-4xl font-bold text-nail-dark mb-4">
+            Client Love
+          </h2>
+          <GoldDivider />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {TESTIMONIALS.map((t, i) => (
+            <div
+              key={t.name}
+              className={`fade-up fade-up-delay-${i + 1} bg-white rounded-2xl p-7 shadow-card flex flex-col`}
+              data-ocid={`testimonials.item.${i + 1}`}
+            >
+              {/* Stars */}
+              <div className="flex gap-1 mb-4">
+                <Star size={14} className="text-gold fill-gold" />
+                <Star size={14} className="text-gold fill-gold" />
+                <Star size={14} className="text-gold fill-gold" />
+                <Star size={14} className="text-gold fill-gold" />
+                <Star size={14} className="text-gold fill-gold" />
+              </div>
+              <p className="font-inter text-sm text-nail-muted leading-relaxed flex-1 italic mb-6">
+                &ldquo;{t.text}&rdquo;
+              </p>
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center font-playfair font-bold text-sm text-white"
+                  style={{ backgroundColor: "oklch(var(--rose))" }}
+                >
+                  {t.initials}
+                </div>
+                <div>
+                  <p className="font-inter text-sm font-semibold text-nail-dark">
+                    {t.name}
+                  </p>
+                  <p className="font-inter text-xs text-gold">
+                    Verified Client
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Slider dots */}
+        <div className="flex justify-center gap-2 mt-8">
+          {TESTIMONIALS.map((tItem, i) => (
+            <div
+              key={tItem.name}
+              className={`rounded-full transition-all ${
+                i === 0 ? "w-6 h-2 bg-rose-cta" : "w-2 h-2 bg-nail-border"
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── About ────────────────────────────────────────────────────────────────────
+
+function AboutSection() {
+  return (
+    <section id="about" className="py-20 md:py-28 bg-cream">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+          {/* Portrait */}
+          <div className="flex flex-col items-center fade-up">
+            <div className="relative">
+              <div
+                className="absolute -inset-3 rounded-full"
+                style={{ border: "2px dashed oklch(var(--gold) / 0.4)" }}
+              />
+              <img
+                src="/assets/generated/pratima-founder.dim_400x400.jpg"
+                alt="Pratima, Founder of Nail World"
+                className="relative w-64 h-64 md:w-80 md:h-80 rounded-full object-cover shadow-luxury"
+              />
+            </div>
+            {/* Trust badges */}
+            <div className="mt-8 grid grid-cols-3 gap-4 w-full max-w-sm">
+              {[
+                { value: "500+", label: "Happy Clients" },
+                { value: "8+", label: "Years Exp." },
+                { value: "100%", label: "Premium" },
+              ].map((badge) => (
+                <div
+                  key={badge.label}
+                  className="text-center py-4 px-2 rounded-xl"
+                  style={{ backgroundColor: "oklch(var(--blush))" }}
+                >
+                  <p className="font-playfair text-2xl font-bold text-gold">
+                    {badge.value}
+                  </p>
+                  <p className="font-inter text-xs text-nail-muted mt-0.5">
+                    {badge.label}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Text */}
+          <div className="fade-up fade-up-delay-2">
+            <SectionLabel>Our Founder</SectionLabel>
+            <h2 className="font-playfair text-3xl md:text-4xl font-bold text-nail-dark mb-4 leading-tight">
+              Meet <span className="text-gold">Pratima</span>
+            </h2>
+            <GoldDivider />
+            <p className="font-inter text-nail-muted leading-relaxed mb-4">
+              With over 8 years of experience in the nail industry, Pratima has
+              transformed thousands of hands into works of art. Her passion for
+              nail artistry began as a personal love for beauty, and evolved
+              into a thriving premium nail studio in the heart of Ghaziabad.
+            </p>
+            <p className="font-inter text-nail-muted leading-relaxed mb-8">
+              At Nail World by Pratima, we believe that beautiful nails aren't a
+              luxury — they're self-care. Every client is treated with
+              personalized attention, premium international products, and a
+              warm, welcoming experience that keeps them coming back.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <RoseButton href={WHATSAPP_URL} data-ocid="about.primary_button">
+                Book with Pratima
+              </RoseButton>
+              <a
+                href="tel:+919810128513"
+                className="inline-flex items-center gap-2 font-inter text-sm font-semibold text-nail-dark hover:text-gold transition-colors"
+                data-ocid="about.link"
+              >
+                <Phone size={16} className="text-gold" />
+                +91 98101 28513
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Contact ──────────────────────────────────────────────────────────────────
 
 function ContactSection() {
-  const [form, setForm] = useState<ContactForm>({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
+  const [form, setForm] = useState({ name: "", phone: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
-    setForm({ name: "", email: "", subject: "", message: "" });
+    setForm({ name: "", phone: "", message: "" });
   };
 
   const inputCls =
-    "w-full font-poppins text-sm border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all bg-white";
+    "w-full font-inter text-sm border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 transition-all bg-white text-nail-dark placeholder:text-nail-muted";
 
   return (
-    <section id="contact" className="py-24 bg-white">
+    <section
+      id="contact"
+      className="py-20 md:py-28"
+      style={{ backgroundColor: "oklch(var(--blush))" }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <SectionHeading
-          title="Find Us"
-          subtitle="Visit us at our salon in Ghaziabad or get in touch — we'd love to hear from you."
-        />
+        <div className="text-center mb-14 fade-up">
+          <SectionLabel>Get In Touch</SectionLabel>
+          <h2 className="font-playfair text-3xl md:text-4xl font-bold text-nail-dark mb-4">
+            Visit Us
+          </h2>
+          <GoldDivider />
+          <p className="font-inter text-nail-muted max-w-lg mx-auto">
+            Find us at Astoria Boulevard Mall, Ghaziabad or reach out to book
+            your next appointment.
+          </p>
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Left: Map + contact info */}
-          <div className="fade-up space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+          {/* Left: Map + info */}
+          <div className="fade-up space-y-6">
             {/* Map */}
-            <div className="rounded-2xl overflow-hidden shadow-md border border-blush">
+            <div
+              className="rounded-2xl overflow-hidden shadow-card border"
+              style={{ borderColor: "oklch(var(--nail-border))" }}
+            >
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3500.0!2d77.4166!3d28.6596!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjjCsDM5JzM0LjYiTiA3N8KwMjUnMDAuMCJF!5e0!3m2!1sen!2sin!4v1234567890!5m2!1sen!2sin"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3500.99!2d77.4355!3d28.6742!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cf1a4!2sAstoria%20Boulevard%20Mall%20Ghaziabad!5e0!3m2!1sen!2sin!4v1234567890!5m2!1sen!2sin"
                 width="100%"
-                height="300"
+                height="280"
                 style={{ border: 0 }}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="Sakshi Salon Location"
+                title="Nail World by Pratima Location"
               />
             </div>
 
-            {/* Contact info */}
-            <div className="bg-blush-light rounded-2xl p-8 space-y-5">
-              <h3 className="font-playfair text-2xl font-bold text-salon-dark mb-6">
-                Contact Info
+            {/* Contact details */}
+            <div className="bg-white rounded-2xl p-7 shadow-card space-y-5">
+              <h3 className="font-playfair text-2xl font-bold text-nail-dark">
+                Contact Details
               </h3>
+
               <div className="flex items-start gap-4">
-                <span className="flex-shrink-0 w-10 h-10 bg-gold rounded-full flex items-center justify-center">
-                  <MapPin size={16} className="text-white" />
+                <span
+                  className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: "oklch(var(--blush))" }}
+                >
+                  <MapPin size={16} className="text-gold" />
                 </span>
                 <div>
-                  <p className="font-poppins text-xs font-semibold uppercase tracking-wider text-gold mb-1">
+                  <p className="font-inter text-xs font-semibold uppercase tracking-wider text-gold mb-1">
                     Address
                   </p>
-                  <p className="font-poppins text-sm text-salon-dark">
-                    Shop No A, 5, near Carte Chowk, Mahindra Enclave,
+                  <p className="font-inter text-sm text-nail-dark leading-relaxed">
+                    LGF 7, Astoria Boulevard Mall,
                     <br />
-                    Shastri Nagar, Ghaziabad, Uttar Pradesh 201002
+                    Hint Chowk, RDC, Sector 15,
+                    <br />
+                    Raj Nagar, Ghaziabad, UP 201002
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-4">
-                <span className="flex-shrink-0 w-10 h-10 bg-gold rounded-full flex items-center justify-center">
-                  <Phone size={16} className="text-white" />
+
+              <div className="flex items-center gap-4">
+                <span
+                  className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: "oklch(var(--blush))" }}
+                >
+                  <Phone size={16} className="text-gold" />
                 </span>
                 <div>
-                  <p className="font-poppins text-xs font-semibold uppercase tracking-wider text-gold mb-1">
+                  <p className="font-inter text-xs font-semibold uppercase tracking-wider text-gold mb-1">
                     Phone
                   </p>
                   <a
-                    href="tel:+919315685969"
-                    className="font-poppins text-sm text-salon-dark hover:text-gold transition-colors font-medium"
+                    href="tel:+919810128513"
+                    className="font-inter text-sm text-nail-dark hover:text-gold transition-colors font-medium"
                     data-ocid="contact.link"
                   >
-                    +91 9315685969
+                    +91 98101 28513
                   </a>
                 </div>
               </div>
-              <div className="flex items-start gap-4">
-                <span className="flex-shrink-0 w-10 h-10 bg-gold rounded-full flex items-center justify-center">
-                  <Mail size={16} className="text-white" />
+
+              <div className="flex items-center gap-4">
+                <span
+                  className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: "oklch(var(--blush))" }}
+                >
+                  <Clock size={16} className="text-gold" />
                 </span>
                 <div>
-                  <p className="font-poppins text-xs font-semibold uppercase tracking-wider text-gold mb-1">
-                    Email
+                  <p className="font-inter text-xs font-semibold uppercase tracking-wider text-gold mb-1">
+                    Working Hours
                   </p>
-                  <a
-                    href="mailto:info@sakshisalon.com"
-                    className="font-poppins text-sm text-salon-dark hover:text-gold transition-colors font-medium"
-                    data-ocid="contact.link"
-                  >
-                    info@sakshisalon.com
-                  </a>
+                  <p className="font-inter text-sm text-nail-dark font-medium">
+                    11:00 AM – 8:00 PM
+                  </p>
+                  <p className="font-inter text-xs text-nail-muted">All Days</p>
                 </div>
               </div>
-              <div className="flex items-start gap-4">
-                <span className="flex-shrink-0 w-10 h-10 bg-gold rounded-full flex items-center justify-center">
-                  <Clock size={16} className="text-white" />
-                </span>
-                <div>
-                  <p className="font-poppins text-xs font-semibold uppercase tracking-wider text-gold mb-1">
-                    Timings
-                  </p>
-                  <p className="font-poppins text-sm text-salon-dark font-medium">
-                    Open 24 Hours
-                  </p>
-                </div>
+
+              {/* Action buttons */}
+              <div className="flex gap-3 pt-2">
+                <a
+                  href="tel:+919810128513"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-inter text-sm font-semibold text-white transition-all hover:-translate-y-0.5"
+                  style={{ backgroundColor: "oklch(var(--gold))" }}
+                  data-ocid="contact.primary_button"
+                >
+                  <Phone size={15} /> Call Now
+                </a>
+                <a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-inter text-sm font-semibold text-white transition-all hover:-translate-y-0.5"
+                  style={{ backgroundColor: "#25D366" }}
+                  data-ocid="contact.secondary_button"
+                >
+                  <MessageCircle size={15} /> WhatsApp
+                </a>
               </div>
             </div>
           </div>
 
           {/* Right: Contact form */}
           <div className="fade-up fade-up-delay-2">
-            <div className="bg-white rounded-2xl shadow-card p-8 border border-blush">
-              <h3 className="font-playfair text-2xl font-bold text-salon-dark mb-2">
-                Send Us a Message
+            <div
+              className="bg-white rounded-2xl shadow-card p-8 border"
+              style={{ borderColor: "oklch(var(--nail-border))" }}
+            >
+              <h3 className="font-playfair text-2xl font-bold text-nail-dark mb-2">
+                Send a Message
               </h3>
-              <p className="font-poppins text-sm text-muted-salon mb-8">
-                We'll get back to you as soon as possible.
+              <p className="font-inter text-sm text-nail-muted mb-7">
+                We'll reach out to confirm your appointment quickly.
               </p>
 
               {submitted ? (
@@ -620,19 +900,22 @@ function ContactSection() {
                   className="text-center py-12"
                   data-ocid="contact.success_state"
                 >
-                  <div className="w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Check size={28} className="text-gold" />
+                  <div
+                    className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                    style={{ backgroundColor: "oklch(var(--blush))" }}
+                  >
+                    <span className="text-2xl">💅</span>
                   </div>
-                  <h4 className="font-playfair text-xl font-bold text-salon-dark mb-2">
+                  <h4 className="font-playfair text-xl font-bold text-nail-dark mb-2">
                     Message Sent!
                   </h4>
-                  <p className="font-poppins text-sm text-muted-salon">
-                    Thank you for reaching out. We'll contact you shortly.
+                  <p className="font-inter text-sm text-nail-muted">
+                    Thank you! Pratima will get back to you shortly.
                   </p>
                   <button
                     type="button"
                     onClick={() => setSubmitted(false)}
-                    className="mt-6 font-poppins text-sm text-gold hover:underline"
+                    className="mt-6 font-inter text-sm text-gold hover:underline"
                   >
                     Send another message
                   </button>
@@ -643,161 +926,88 @@ function ContactSection() {
                   className="space-y-5"
                   data-ocid="contact.panel"
                 >
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div>
-                      <label
-                        htmlFor="contact-name"
-                        className="font-poppins text-xs font-semibold text-salon-dark uppercase tracking-wider block mb-2"
-                      >
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={form.name}
-                        onChange={(e) =>
-                          setForm((p) => ({ ...p, name: e.target.value }))
-                        }
-                        id="contact-name"
-                        placeholder="Your Name"
-                        className={inputCls}
-                        data-ocid="contact.input"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="contact-email"
-                        className="font-poppins text-xs font-semibold text-salon-dark uppercase tracking-wider block mb-2"
-                      >
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        value={form.email}
-                        onChange={(e) =>
-                          setForm((p) => ({ ...p, email: e.target.value }))
-                        }
-                        id="contact-email"
-                        placeholder="Your Email"
-                        className={inputCls}
-                        data-ocid="contact.input"
-                      />
-                    </div>
-                  </div>
                   <div>
                     <label
-                      htmlFor="contact-subject"
-                      className="font-poppins text-xs font-semibold text-salon-dark uppercase tracking-wider block mb-2"
+                      htmlFor="c-name"
+                      className="font-inter text-xs font-semibold uppercase tracking-wider text-nail-dark block mb-2"
                     >
-                      Subject
+                      Your Name
                     </label>
                     <input
+                      id="c-name"
                       type="text"
                       required
-                      value={form.subject}
+                      value={form.name}
                       onChange={(e) =>
-                        setForm((p) => ({ ...p, subject: e.target.value }))
+                        setForm((p) => ({ ...p, name: e.target.value }))
                       }
-                      id="contact-subject"
-                      placeholder="How can we help?"
+                      placeholder="e.g. Priya Sharma"
                       className={inputCls}
+                      style={{
+                        borderColor: "oklch(var(--nail-border))",
+                        outlineColor: "oklch(var(--rose))",
+                      }}
                       data-ocid="contact.input"
                     />
                   </div>
                   <div>
                     <label
-                      htmlFor="contact-message"
-                      className="font-poppins text-xs font-semibold text-salon-dark uppercase tracking-wider block mb-2"
+                      htmlFor="c-phone"
+                      className="font-inter text-xs font-semibold uppercase tracking-wider text-nail-dark block mb-2"
+                    >
+                      Phone Number
+                    </label>
+                    <input
+                      id="c-phone"
+                      type="tel"
+                      required
+                      value={form.phone}
+                      onChange={(e) =>
+                        setForm((p) => ({ ...p, phone: e.target.value }))
+                      }
+                      placeholder="+91 XXXXX XXXXX"
+                      className={inputCls}
+                      style={{
+                        borderColor: "oklch(var(--nail-border))",
+                        outlineColor: "oklch(var(--rose))",
+                      }}
+                      data-ocid="contact.input"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="c-msg"
+                      className="font-inter text-xs font-semibold uppercase tracking-wider text-nail-dark block mb-2"
                     >
                       Message
                     </label>
                     <textarea
+                      id="c-msg"
                       required
-                      id="contact-message"
                       rows={5}
                       value={form.message}
                       onChange={(e) =>
                         setForm((p) => ({ ...p, message: e.target.value }))
                       }
-                      placeholder="Tell us about your appointment or query..."
+                      placeholder="Tell us what service you're interested in, preferred date/time..."
                       className={`${inputCls} resize-none`}
+                      style={{
+                        borderColor: "oklch(var(--nail-border))",
+                        outlineColor: "oklch(var(--rose))",
+                      }}
                       data-ocid="contact.textarea"
                     />
                   </div>
-                  <GoldButton
+                  <RoseButton
                     className="w-full"
                     data-ocid="contact.submit_button"
                   >
                     Send Message
-                  </GoldButton>
+                  </RoseButton>
                 </form>
               )}
             </div>
           </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── Newsletter ───────────────────────────────────────────────────────────────
-
-function NewsletterSection() {
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubscribed(true);
-    setEmail("");
-  };
-
-  return (
-    <section className="py-20 bg-blush">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div className="fade-up">
-          <Sparkles className="mx-auto text-gold mb-4" size={32} />
-          <h2 className="font-playfair text-4xl font-bold text-salon-dark mb-4">
-            Subscribe for Beauty Tips &amp; Offers
-          </h2>
-          <p className="font-poppins text-muted-salon mb-10">
-            Stay updated with the latest trends and exclusive offers from Sakshi
-            Salon.
-          </p>
-          {subscribed ? (
-            <div
-              className="bg-gold/10 rounded-2xl p-8"
-              data-ocid="newsletter.success_state"
-            >
-              <Check className="mx-auto text-gold mb-3" size={32} />
-              <p className="font-playfair text-xl font-bold text-salon-dark">
-                Thank You for Subscribing!
-              </p>
-              <p className="font-poppins text-sm text-muted-salon mt-2">
-                You'll receive our latest beauty tips and exclusive offers.
-              </p>
-            </div>
-          ) : (
-            <form
-              onSubmit={handleSubscribe}
-              className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto"
-              data-ocid="newsletter.panel"
-            >
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                className="flex-1 font-poppins text-sm border border-border bg-white rounded-full px-6 py-3 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
-                data-ocid="newsletter.input"
-              />
-              <GoldButton data-ocid="newsletter.submit_button">
-                Subscribe
-              </GoldButton>
-            </form>
-          )}
         </div>
       </div>
     </section>
@@ -811,69 +1021,71 @@ function Footer() {
   const hostname =
     typeof window !== "undefined"
       ? window.location.hostname
-      : "sakshisalon.com";
+      : "nailworldbypratima.com";
   const caffeineUrl = `https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(hostname)}`;
 
   return (
     <footer
-      style={{ backgroundColor: "oklch(0.11 0 0)" }}
       className="text-white"
+      style={{ backgroundColor: "oklch(0.18 0.008 42)" }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand */}
           <div>
             <div className="mb-4">
-              <span className="font-playfair text-3xl font-bold text-gold">
-                Sakshi
+              <span className="font-playfair text-2xl font-bold tracking-widest uppercase text-gold">
+                Nail World
               </span>
               <br />
-              <span className="font-poppins text-xs font-medium text-white/70 tracking-widest uppercase">
-                Salon &amp; Academy
+              <span className="font-cormorant italic text-sm font-medium text-white/60 tracking-wider">
+                by Pratima
               </span>
             </div>
-            <p className="font-poppins text-sm text-white/60 leading-relaxed mb-6">
-              Premier beauty salon and academy in Ghaziabad. Elevating beauty,
-              one client at a time.
+            <p className="font-inter text-sm text-white/50 leading-relaxed mb-5">
+              Luxury Nails, Perfect Style. Premium nail studio in Ghaziabad
+              offering expert nail art and care services.
             </p>
-            {/* Socials */}
             <div className="flex items-center gap-3">
               <a
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-white/10 hover:bg-gold flex items-center justify-center transition-colors"
+                className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+                style={{ backgroundColor: "oklch(1 0 0 / 0.1)" }}
                 data-ocid="footer.link"
                 aria-label="Instagram"
               >
-                <Instagram size={16} />
+                <Instagram size={15} />
               </a>
               <a
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-white/10 hover:bg-gold flex items-center justify-center transition-colors"
+                className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+                style={{ backgroundColor: "oklch(1 0 0 / 0.1)" }}
                 data-ocid="footer.link"
                 aria-label="Facebook"
               >
-                <Facebook size={16} />
+                <Facebook size={15} />
               </a>
               <a
-                href="https://wa.me/919315685969"
+                href={WHATSAPP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-white/10 hover:bg-gold flex items-center justify-center transition-colors"
+                className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+                style={{ backgroundColor: "#25D366" }}
                 data-ocid="footer.link"
                 aria-label="WhatsApp"
               >
-                <MessageCircle size={16} />
+                <MessageCircle size={15} />
               </a>
             </div>
           </div>
 
           {/* Quick links */}
           <div>
-            <h4 className="font-poppins text-sm font-semibold uppercase tracking-widest text-gold mb-5">
+            <h4 className="font-inter text-xs font-semibold uppercase tracking-widest text-gold mb-5">
               Quick Links
             </h4>
             <ul className="space-y-3">
@@ -881,7 +1093,7 @@ function Footer() {
                 <li key={link.href}>
                   <a
                     href={link.href}
-                    className="font-poppins text-sm text-white/60 hover:text-gold transition-colors flex items-center gap-2"
+                    className="font-inter text-sm text-white/50 hover:text-gold transition-colors flex items-center gap-2"
                     data-ocid="footer.link"
                   >
                     <ChevronRight size={12} className="text-gold" />
@@ -892,17 +1104,17 @@ function Footer() {
             </ul>
           </div>
 
-          {/* Services list */}
+          {/* Services */}
           <div>
-            <h4 className="font-poppins text-sm font-semibold uppercase tracking-widest text-gold mb-5">
-              Our Services
+            <h4 className="font-inter text-xs font-semibold uppercase tracking-widest text-gold mb-5">
+              Services
             </h4>
             <ul className="space-y-3">
               {SERVICES.map((s) => (
                 <li key={s.title}>
                   <a
                     href="#services"
-                    className="font-poppins text-sm text-white/60 hover:text-gold transition-colors flex items-center gap-2"
+                    className="font-inter text-sm text-white/50 hover:text-gold transition-colors flex items-center gap-2"
                     data-ocid="footer.link"
                   >
                     <ChevronRight size={12} className="text-gold" />
@@ -915,52 +1127,45 @@ function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-poppins text-sm font-semibold uppercase tracking-widest text-gold mb-5">
+            <h4 className="font-inter text-xs font-semibold uppercase tracking-widest text-gold mb-5">
               Contact
             </h4>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <MapPin size={14} className="text-gold mt-1 flex-shrink-0" />
-                <span className="font-poppins text-sm text-white/60 leading-relaxed">
-                  Shop No A, 5, near Carte Chowk, Mahindra Enclave, Shastri
+                <span className="font-inter text-sm text-white/50 leading-relaxed">
+                  LGF 7, Astoria Boulevard Mall, Hint Chowk, RDC, Sector 15, Raj
                   Nagar, Ghaziabad, UP 201002
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone size={14} className="text-gold flex-shrink-0" />
                 <a
-                  href="tel:+919315685969"
-                  className="font-poppins text-sm text-white/60 hover:text-gold transition-colors"
+                  href="tel:+919810128513"
+                  className="font-inter text-sm text-white/50 hover:text-gold transition-colors"
                   data-ocid="footer.link"
                 >
-                  +91 9315685969
-                </a>
-              </li>
-              <li className="flex items-center gap-3">
-                <Mail size={14} className="text-gold flex-shrink-0" />
-                <a
-                  href="mailto:info@sakshisalon.com"
-                  className="font-poppins text-sm text-white/60 hover:text-gold transition-colors"
-                  data-ocid="footer.link"
-                >
-                  info@sakshisalon.com
+                  +91 98101 28513
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Clock size={14} className="text-gold flex-shrink-0" />
-                <span className="font-poppins text-sm text-white/60">
-                  Open 24 Hours
+                <span className="font-inter text-sm text-white/50">
+                  11:00 AM – 8:00 PM
                 </span>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-14 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="font-poppins text-sm text-white/40 text-center">
-            © {year} Sakshi Salon &amp; Academy. All Rights Reserved.
+        <div
+          className="mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4"
+          style={{ borderTop: "1px solid oklch(1 0 0 / 0.1)" }}
+        >
+          <p className="font-inter text-sm text-white/30 text-center">
+            © {year} Nail World by Pratima. All rights reserved.
           </p>
-          <p className="font-poppins text-xs text-white/30">
+          <p className="font-inter text-xs text-white/25">
             Built with ❤️ using{" "}
             <a
               href={caffeineUrl}
@@ -981,27 +1186,27 @@ function Footer() {
 
 function FloatingButtons() {
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3 items-center">
+    <div className="fixed bottom-6 right-5 z-50 flex flex-col gap-3 items-center">
+      {/* Book Now pill */}
+      <a
+        href="#contact"
+        className="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-full font-inter text-xs font-semibold text-white shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+        style={{ backgroundColor: "oklch(var(--rose))" }}
+        data-ocid="booknow.button"
+      >
+        <Sparkles size={13} /> Book Now
+      </a>
       {/* WhatsApp */}
       <a
-        href="https://wa.me/919315685969?text=Hello%20Sakshi%20Salon%20%26%20Academy!%20I%20would%20like%20to%20book%20an%20appointment.%20Please%20let%20me%20know%20the%20available%20slots%20and%20services.%20Thank%20you!"
+        href={WHATSAPP_URL}
         target="_blank"
         rel="noopener noreferrer"
         className="w-14 h-14 rounded-full flex items-center justify-center shadow-xl hover:-translate-y-1 transition-all duration-300"
         style={{ backgroundColor: "#25D366" }}
-        aria-label="WhatsApp"
+        aria-label="Chat on WhatsApp"
         data-ocid="whatsapp.button"
       >
-        <MessageCircle size={24} className="text-white" />
-      </a>
-      {/* Call Now */}
-      <a
-        href="tel:+919315685969"
-        className="bg-gold hover:bg-gold-dark text-white w-14 h-14 rounded-full flex items-center justify-center shadow-xl hover:-translate-y-1 transition-all duration-300"
-        aria-label="Call Now"
-        data-ocid="callnow.button"
-      >
-        <Phone size={20} className="text-white" />
+        <MessageCircle size={22} className="text-white" />
       </a>
     </div>
   );
@@ -1018,10 +1223,10 @@ export default function App() {
       <main>
         <HeroSection />
         <ServicesSection />
-        <AboutSection />
         <GallerySection />
+        <TestimonialsSection />
+        <AboutSection />
         <ContactSection />
-        <NewsletterSection />
       </main>
       <Footer />
       <FloatingButtons />

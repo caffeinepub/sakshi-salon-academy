@@ -17,7 +17,8 @@ export default {
     extend: {
       fontFamily: {
         playfair: ["Playfair Display", "serif"],
-        poppins: ["Poppins", "sans-serif"],
+        inter: ["Inter", "sans-serif"],
+        cormorant: ["Cormorant Garamond", "serif"],
       },
       colors: {
         border: "oklch(var(--border))",
@@ -72,9 +73,13 @@ export default {
         },
         gold: "oklch(var(--gold))",
         "gold-dark": "oklch(var(--gold-dark))",
-        blush: "oklch(var(--blush))",
-        "blush-light": "oklch(var(--blush-light))",
-        "salon-dark": "oklch(var(--salon-dark))",
+        "rose-cta": "oklch(var(--rose))",
+        "rose-dark": "oklch(var(--rose-dark))",
+        cream: "oklch(var(--cream))",
+        "blush-panel": "oklch(var(--blush))",
+        "blush-deep": "oklch(var(--blush-deep))",
+        "nail-dark": "oklch(var(--nail-dark))",
+        "nail-muted": "oklch(var(--nail-muted))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -83,8 +88,9 @@ export default {
       },
       boxShadow: {
         xs: "0 1px 2px 0 rgba(0,0,0,0.05)",
-        card: "0 4px 20px rgba(194, 161, 101, 0.12), 0 1px 6px rgba(0,0,0,0.06)",
-        "card-hover": "0 8px 30px rgba(194, 161, 101, 0.2), 0 2px 10px rgba(0,0,0,0.08)",
+        card: "0 4px 24px rgba(176,138,69,0.10), 0 1px 6px rgba(0,0,0,0.05)",
+        "card-hover": "0 8px 36px rgba(207,161,160,0.25), 0 2px 12px rgba(0,0,0,0.08)",
+        luxury: "0 20px 60px rgba(176,138,69,0.15), 0 4px 20px rgba(0,0,0,0.08)",
       },
       keyframes: {
         "accordion-down": {
@@ -95,10 +101,15 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        shimmer: {
+          "0%": { backgroundPosition: "-200% center" },
+          "100%": { backgroundPosition: "200% center" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        shimmer: "shimmer 2.5s linear infinite",
       },
     },
   },
